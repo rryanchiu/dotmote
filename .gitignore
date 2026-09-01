@@ -1,0 +1,7 @@
+node_modules
+dist
+*.log
+.vite
+.DS_Store
+*.tsbuildinfo
+.claude
