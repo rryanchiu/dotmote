@@ -30,11 +30,14 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "README.zh-CN.md",
+    "LICENSE"
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
     "build": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "npm run build",
     "lint": "eslint . --ext .ts,.tsx",
     "test": "vitest run",
     "dev": "vite",

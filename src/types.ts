@@ -38,8 +38,10 @@ export type MotionMode =
  * `dot` and `background` are optional so a preset can keep them neutral.
  */
 export interface ThemeConfig {
-  /** Dot color of the background lattice (CSS color string). */
-  dot?: string;
+  /** Dot color of the background lattice (CSS color string). Defaults to `rgba(128,128,128,0.5)`. */
+  dotColor?: string;
+  /** Color of the *illuminated* (lit) dots. When set the glow is a flat color (all three gradient stops). Omit to use `glow`. */
+  activeDotColor?: string;
   /** Three-stop linear gradient for the illuminated glow: [start, mid, end]. */
   glow: [string, string, string];
   /** Optional background color applied to the element (behind the dots). */
@@ -62,19 +64,16 @@ export interface Breakpoints {
 }
 
 export interface DotmoteProps {
+  /**
+   * String content — each character becomes a drifting body (whitespace is
+   * skipped) and is rendered as one letter/emoji. Shorthand for passing an
+   * array of one-character text items. Takes precedence over {@link items}.
+   */
+  values?: string;
   /** Bodies to drift. Defaults to the neutral letters `['A','B','C','D','E']`. */
   items?: ContentInput[];
   /** Theme preset or custom config. Defaults to `'mono'`. */
   theme?: ThemeLike;
-  /** Dot color of the background lattice. Overrides the theme's `dot`. */
-  dotColor?: string;
-  /**
-   * Color of the *illuminated* (lit) dots — the glow. When set it's used as a
-   * solid color for all three gradient stops (a flat-color light blob). When
-   * omitted, the theme's gradient glow is used. Hex strings (no alpha) are the
-   * easiest to pick visually.
-   */
-  activeDotColor?: string;
   /** Dot radius in px. Defaults to `spacing <= 9 ? 0.82 : 1`. */
   dotRadius?: number;
   /**

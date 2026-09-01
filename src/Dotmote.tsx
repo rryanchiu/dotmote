@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react';
 
 import type {
   ContentInput,
+  ContentItem,
   CoreOptions,
   DotmoteProps,
 } from './types.js';
@@ -24,14 +25,26 @@ const DEFAULT_GLOW: [string, string, string] = [
   'rgba(220, 220, 220, 0.9)',
 ];
 
+function resolveItemBodies(props: DotmoteProps): ContentItem[] {
+  if (props.values !== undefined) {
+    const out: ContentItem[] = [];
+    for (const ch of Array.from(props.values)) {
+      if (ch.trim().length === 0) continue;
+      out.push({ kind: 'text', value: ch });
+    }
+    return out;
+  }
+  return normalizeItems(props.items ?? DEFAULT_ITEMS_INPUT);
+}
+
 function buildOptions(props: DotmoteProps): CoreOptions {
   const theme = resolveTheme(props.theme);
-  const glow: [string, string, string] = props.activeDotColor
-    ? [props.activeDotColor, props.activeDotColor, props.activeDotColor]
+  const glow: [string, string, string] = theme.activeDotColor
+    ? [theme.activeDotColor, theme.activeDotColor, theme.activeDotColor]
     : theme.glow ?? DEFAULT_GLOW;
   return {
-    items: normalizeItems(props.items ?? DEFAULT_ITEMS_INPUT),
-    dot: props.dotColor ?? theme.dot ?? DEFAULT_DOT,
+    items: resolveItemBodies(props),
+    dot: theme.dotColor ?? DEFAULT_DOT,
     glow,
     background: theme.background,
     dotRadius: props.dotRadius,
@@ -89,10 +102,9 @@ export function Dotmote(props: DotmoteProps): JSX.Element {
   // every render. buildOptions reads only the fields listed below.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const options = useMemo(() => buildOptions(props), [
+    props.values,
     props.items,
     props.theme,
-    props.dotColor,
-    props.activeDotColor,
     props.dotRadius,
     props.glowStrength,
     props.glowAlpha,

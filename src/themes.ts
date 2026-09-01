@@ -11,7 +11,7 @@ export const themes: Record<'light' | 'dark' | 'mono' | 'gradient' | 'rainbow', 
   /** Classic light theme: white background, soft gray dots, mid-gray glow. */
   light: {
     background: '#ffffff',
-    dot: 'rgb(230, 228, 228)',
+    dotColor: 'rgb(230, 228, 228)',
     glow: [
       'rgb(160, 159, 159)',
       'rgb(160, 159, 159)',
@@ -20,7 +20,7 @@ export const themes: Record<'light' | 'dark' | 'mono' | 'gradient' | 'rainbow', 
   },
   /** Soft light dots that sit on dark backdrops. */
   dark: {
-    dot: 'rgba(255, 255, 255, 0.16)',
+    dotColor: 'rgba(255, 255, 255, 0.16)',
     glow: [
       'rgba(255, 255, 255, 0.14)',
       'rgba(255, 255, 255, 0.30)',
@@ -29,7 +29,7 @@ export const themes: Record<'light' | 'dark' | 'mono' | 'gradient' | 'rainbow', 
   },
   /** The default — a neutral gray-readable lattice on any backdrop. */
   mono: {
-    dot: 'rgba(128, 128, 128, 0.5)',
+    dotColor: 'rgba(128, 128, 128, 0.5)',
     glow: [
       'rgba(120, 120, 120, 0.9)',
       'rgba(170, 170, 170, 0.9)',
@@ -38,16 +38,16 @@ export const themes: Record<'light' | 'dark' | 'mono' | 'gradient' | 'rainbow', 
   },
   /** A colorful (but still generic) gradient for demos. */
   gradient: {
-    dot: 'rgba(128, 128, 128, 0.5)',
+    dotColor: 'rgba(128, 128, 128, 0.5)',
     glow: [
+      'rgba(56, 189, 248, 0.9)',
       'rgba(99, 102, 241, 0.9)',
-      'rgba(139, 92, 246, 0.9)',
-      'rgba(217, 70, 239, 0.9)',
+      'rgba(236, 72, 153, 0.9)',
     ],
   },
   /** Rainbow glow: a red → green → blue sweep for the illuminated dots. */
   rainbow: {
-    dot: 'rgba(128, 128, 128, 0.5)',
+    dotColor: 'rgba(128, 128, 128, 0.5)',
     glow: [
       'rgba(255, 77, 77, 0.9)',
       'rgba(61, 220, 132, 0.9)',
@@ -77,8 +77,9 @@ export function resolveTheme(theme?: ThemeLike): ThemeConfig {
       ? theme.glow
       : themes.mono.glow;
   return {
-    dot: theme.dot ?? themes.mono.dot,
+    dotColor: theme.dotColor ?? themes.mono.dotColor,
     glow: [glow[0], glow[1], glow[2]],
+    ...(theme.activeDotColor ? { activeDotColor: theme.activeDotColor } : {}),
     ...(theme.background ? { background: theme.background } : {}),
   };
 }

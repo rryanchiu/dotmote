@@ -53,6 +53,32 @@ body {
   letter-spacing: 0.5px;
 }
 
+.panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.panel-head .head-copy {
+  min-width: 0;
+}
+
+.lang-select {
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: inherit;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.lang-select option {
+  color: #111;
+}
+
 .panel-head .subtitle {
   margin: 4px 0 22px;
   font-size: 13px;
@@ -112,6 +138,11 @@ body {
 
 .cfg-row .chip-row {
   flex: 1;
+}
+
+.cfg-row input[type='text'] {
+  flex: 1;
+  min-width: 0;
 }
 
 .cfg-row input[type='range'] {

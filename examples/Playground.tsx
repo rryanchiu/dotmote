@@ -1,79 +1,119 @@
 import { useMemo, useState } from 'react';
-import { Dotmote } from '../src';
-import type { ContentInput, DotmoteProps, MotionMode, ThemeConfig, ThemePreset } from '../src';
+import { Dotmote, resolveTheme } from '../src';
+import type { DotmoteProps, MotionMode, ThemeConfig, ThemePreset } from '../src';
 import './playground.css';
 
 const THEMES: ThemePreset[] = ['mono', 'light', 'dark', 'gradient', 'rainbow'];
 const MOTIONS: MotionMode[] = ['drift', 'roam', 'static', 'ticker-left', 'ticker-right'];
 
-const ITEM_PRESETS: Record<string, ContentInput[]> = {
-  letters: ['A', 'B', 'C', 'D', 'E'],
-  hello: ['H', 'i', '👋'],
-  emoji: ['🌊', '🔥', '⭐', '🌙'],
-  shapes: [
-    { kind: 'shape', value: 'circle' },
-    { kind: 'shape', value: 'square' },
-    { kind: 'shape', value: 'triangle' },
-    { kind: 'shape', value: 'star' },
-    { kind: 'shape', value: 'diamond' },
-  ],
+type Lang = 'en' | 'zh';
+
+interface Strings {
+  subtitle: string;
+  theme: string;
+  content: string;
+  motion: string;
+  speed: string;
+  glow: string;
+  dotRadius: string;
+  spacing: string;
+  dotColor: string;
+  activeDot: string;
+  auto: string;
+  usage: string;
+  copy: string;
+  copied: string;
+  contentPlaceholder: string;
+  hint: string;
+}
+
+const STRINGS: Record<Lang, Strings> = {
+  en: {
+    subtitle: 'Dotted-matrix glow background · React + Canvas',
+    theme: 'Theme',
+    content: 'Content',
+    motion: 'Motion',
+    speed: 'speed',
+    glow: 'glow',
+    dotRadius: 'dotRadius',
+    spacing: 'spacing',
+    dotColor: 'dotColor',
+    activeDot: 'activeDot',
+    auto: 'auto',
+    usage: 'Usage example',
+    copy: 'Copy',
+    copied: 'Copied ✓',
+    contentPlaceholder: 'Type content…',
+    hint: 'Type content above — each character becomes a drifting body. Resize across 372 / 640px to see breakpoints; switch motion to ticker-left / ticker-right for the marquee look.',
+  },
+  zh: {
+    subtitle: '点阵发光背景 · React + Canvas',
+    theme: '主题',
+    content: '内容',
+    motion: '动效',
+    speed: '速度',
+    glow: '辉光',
+    dotRadius: '点半径',
+    spacing: '间距',
+    dotColor: '点颜色',
+    activeDot: '高亮点',
+    auto: '自动',
+    usage: '使用示例',
+    copy: '复制',
+    copied: '已复制 ✓',
+    contentPlaceholder: '输入内容…',
+    hint: '在上方输入内容，每个字符会成为漂浮主体；拖动窗口跨过 372 / 640px 可看到断点；motion 切到 ticker-left / ticker-right 看广告屏滚动。',
+  },
 };
 
-const DEFAULT_LETTERS = ['A', 'B', 'C', 'D', 'E'];
+const LANGS: { value: Lang; label: string }[] = [
+  { value: 'zh', label: '简体中文' },
+  { value: 'en', label: 'English' },
+];
+
+function detectLang(): Lang {
+  if (typeof navigator !== 'undefined' && navigator.language?.toLowerCase().startsWith('zh')) {
+    return 'zh';
+  }
+  return 'en';
+}
 
 function toHex(c: string | undefined, fallback: string): string {
   return typeof c === 'string' && /^#[0-9a-fA-F]{6}$/.test(c) ? c : fallback;
 }
 
-function isDefaultItems(items: ContentInput[]): boolean {
-  return (
-    items.length === DEFAULT_LETTERS.length &&
-    items.every((it, i) => it === DEFAULT_LETTERS[i])
-  );
+function valuesAttr(v: string): string {
+  return /["\n<>&]/.test(v) ? `values={${JSON.stringify(v)}}` : `values="${v}"`;
 }
 
-function serializeItem(it: { kind: string; value?: unknown; radius?: number }): string {
-  const parts = [`kind: ${JSON.stringify(it.kind)}`];
-  if (it.value !== undefined) parts.push(`value: ${JSON.stringify(it.value)}`);
-  if (it.radius !== undefined) parts.push(`radius: ${it.radius}`);
-  return `{ ${parts.join(', ')} }`;
-}
-
-function serializeItems(items: ContentInput[]): string {
-  return `[${items
-    .map((it) => (typeof it === 'string' ? JSON.stringify(it) : serializeItem(it)))
-    .join(', ')}]`;
+function themeAttr(theme: ThemeConfig | ThemePreset): string {
+  if (typeof theme === 'string') return `theme="${theme}"`;
+  const parts: string[] = [];
+  if (theme.dotColor !== undefined) parts.push(`dotColor: ${JSON.stringify(theme.dotColor)}`);
+  if (theme.activeDotColor !== undefined) parts.push(`activeDotColor: ${JSON.stringify(theme.activeDotColor)}`);
+  if (theme.glow) parts.push(`glow: ${JSON.stringify(theme.glow)}`);
+  if (theme.background) parts.push(`background: ${JSON.stringify(theme.background)}`);
+  return `theme={{ ${parts.join(', ')} }}`;
 }
 
 interface UsageState {
   theme: ThemeConfig | ThemePreset;
-  items: ContentInput[];
+  values: string;
   speed: number;
   motion: MotionMode;
   glowStrength: number;
   dotRadius: number | undefined;
-  dotColor: string | undefined;
-  activeDotColor: string | undefined;
   spacingScale: number;
 }
 
 function buildUsageCode(p: UsageState): string {
   const f: string[] = [];
-  if (p.theme !== 'mono') {
-    if (typeof p.theme === 'string') {
-      f.push(`theme="${p.theme}"`);
-    } else {
-      const dot = p.theme.dot ?? 'rgba(128, 128, 128, 0.5)';
-      f.push(`theme={{ dot: ${JSON.stringify(dot)}, glow: ${JSON.stringify(p.theme.glow)} }}`);
-    }
-  }
-  if (!isDefaultItems(p.items)) f.push(`items={${serializeItems(p.items)}}`);
+  if (p.theme !== 'mono') f.push(themeAttr(p.theme));
+  if (p.values.trim()) f.push(valuesAttr(p.values));
   if (p.speed !== 1) f.push(`speed={${p.speed}}`);
   if (p.motion !== 'drift') f.push(`motion="${p.motion}"`);
   if (p.glowStrength !== 1) f.push(`glowStrength={${p.glowStrength}}`);
   if (p.dotRadius !== undefined) f.push(`dotRadius={${p.dotRadius}}`);
-  if (p.dotColor !== undefined) f.push(`dotColor="${p.dotColor}"`);
-  if (p.activeDotColor !== undefined) f.push(`activeDotColor="${p.activeDotColor}"`);
   if (p.spacingScale !== 1) f.push(`spacingScale={${p.spacingScale}}`);
 
   const header = "import { Dotmote } from 'dotmote';\n\n";
@@ -83,7 +123,7 @@ function buildUsageCode(p: UsageState): string {
 
 export function App() {
   const [theme, setTheme] = useState<ThemePreset>('gradient');
-  const [itemKey, setItemKey] = useState<keyof typeof ITEM_PRESETS>('letters');
+  const [content, setContent] = useState('dotmote');
   const [speed, setSpeed] = useState(1);
   const [motion, setMotion] = useState<MotionMode>('drift');
   const [glowStrength, setGlowStrength] = useState(1);
@@ -92,24 +132,26 @@ export function App() {
   const [activeDotColor, setActiveDotColor] = useState<string | undefined>(undefined);
   const [spacingScale, setSpacingScale] = useState(1);
   const [copied, setCopied] = useState(false);
+  const [lang, setLang] = useState<Lang>(detectLang);
+  const t = STRINGS[lang];
 
   const resolvedTheme: ThemeConfig | ThemePreset = useMemo(() => {
-    if (theme !== 'gradient') return theme;
+    if (dotColor === undefined && activeDotColor === undefined) return theme;
+    const base = resolveTheme(theme);
     return {
-      dot: 'rgba(128, 128, 128, 0.5)',
-      glow: ['rgba(56, 189, 248, 0.9)', 'rgba(99, 102, 241, 0.9)', 'rgba(236, 72, 153, 0.9)'],
+      ...base,
+      ...(dotColor !== undefined ? { dotColor } : {}),
+      ...(activeDotColor !== undefined ? { activeDotColor } : {}),
     };
-  }, [theme]);
+  }, [theme, dotColor, activeDotColor]);
 
   const props: DotmoteProps = {
     theme: resolvedTheme,
-    items: ITEM_PRESETS[itemKey],
+    values: content,
     speed,
     motion,
     glowStrength,
     dotRadius,
-    dotColor,
-    activeDotColor,
     spacingScale,
   };
 
@@ -117,16 +159,14 @@ export function App() {
     () =>
       buildUsageCode({
         theme: resolvedTheme,
-        items: ITEM_PRESETS[itemKey],
+        values: content,
         speed,
         motion,
         glowStrength,
         dotRadius,
-        dotColor,
-        activeDotColor,
         spacingScale,
       }),
-    [resolvedTheme, itemKey, speed, motion, glowStrength, dotRadius, dotColor, activeDotColor, spacingScale],
+    [resolvedTheme, content, speed, motion, glowStrength, dotRadius, spacingScale],
   );
 
   function copy() {
@@ -169,14 +209,28 @@ export function App() {
 
       <div className="panel">
         <div className="panel-head">
-          <h1>dotmote</h1>
-          <p className="subtitle">Dotted-matrix glow background · React + Canvas</p>
+          <div className="head-copy">
+            <h1>dotmote</h1>
+            <p className="subtitle">{t.subtitle}</p>
+          </div>
+          <select
+            className="lang-select"
+            value={lang}
+            onChange={(e) => setLang(e.target.value as Lang)}
+            aria-label="Language"
+          >
+            {LANGS.map((l) => (
+              <option key={l.value} value={l.value}>
+                {l.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="panel-body">
           <div className="col config">
             <div className="cfg-row">
-              <span className="cfg-label">Theme</span>
+              <span className="cfg-label">{t.theme}</span>
               <div className="chip-row">
                 {THEMES.map((t) => (
                   <button key={t} className={theme === t ? 'on' : ''} onClick={() => setTheme(t)}>
@@ -186,17 +240,16 @@ export function App() {
               </div>
             </div>
             <div className="cfg-row">
-              <span className="cfg-label">Content</span>
-              <div className="chip-row">
-                {(Object.keys(ITEM_PRESETS) as (keyof typeof ITEM_PRESETS)[]).map((k) => (
-                  <button key={k} className={itemKey === k ? 'on' : ''} onClick={() => setItemKey(k)}>
-                    {k}
-                  </button>
-                ))}
-              </div>
+              <span className="cfg-label">{t.content}</span>
+              <input
+                type="text"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder={t.contentPlaceholder}
+              />
             </div>
             <div className="cfg-row">
-              <span className="cfg-label">Motion</span>
+              <span className="cfg-label">{t.motion}</span>
               <div className="chip-row">
                 {MOTIONS.map((m) => (
                   <button key={m} className={motion === m ? 'on' : ''} onClick={() => setMotion(m)}>
@@ -207,44 +260,44 @@ export function App() {
             </div>
             <div className="cfg-row">
               <span className="cfg-label">
-                speed&nbsp;<b>{speed.toFixed(2)}</b>
+                {t.speed}&nbsp;<b>{speed.toFixed(2)}</b>
               </span>
               <input type="range" min={0.2} max={3} step={0.05} value={speed} onChange={(e) => setSpeed(Number(e.target.value))} />
             </div>
             <div className="cfg-row">
               <span className="cfg-label">
-                glow&nbsp;<b>{glowStrength.toFixed(2)}</b>
+                {t.glow}&nbsp;<b>{glowStrength.toFixed(2)}</b>
               </span>
               <input type="range" min={0} max={3} step={0.1} value={glowStrength} onChange={(e) => setGlowStrength(Number(e.target.value))} />
             </div>
             <div className="cfg-row">
               <span className="cfg-label">
-                dotRadius&nbsp;<b>{dotRadius ?? 'auto'}</b>
+                {t.dotRadius}&nbsp;<b>{dotRadius ?? t.auto}</b>
               </span>
               <div className="range-wrap">
                 <input type="range" min={0} max={4} step={0.25} value={dotRadius ?? 0} onChange={(e) => setDotRadius(Number(e.target.value) || undefined)} />
-                <button className="tiny" onClick={() => setDotRadius(undefined)}>auto</button>
+                <button className="tiny" onClick={() => setDotRadius(undefined)}>{t.auto}</button>
               </div>
             </div>
             <div className="cfg-row two">
               <div className="color-group">
-                <span className="cfg-label">dotColor</span>
+                <span className="cfg-label">{t.dotColor}</span>
                 <div className="color-row">
                   <input type="color" value={toHex(dotColor, '#808080')} onChange={(e) => setDotColor(e.target.value)} />
-                  <button className="tiny" onClick={() => setDotColor(undefined)}>auto</button>
+                  <button className="tiny" onClick={() => setDotColor(undefined)}>{t.auto}</button>
                 </div>
               </div>
               <div className="color-group">
-                <span className="cfg-label">activeDot</span>
+                <span className="cfg-label">{t.activeDot}</span>
                 <div className="color-row">
                   <input type="color" value={toHex(activeDotColor, '#a09f9f')} onChange={(e) => setActiveDotColor(e.target.value)} />
-                  <button className="tiny" onClick={() => setActiveDotColor(undefined)}>auto</button>
+                  <button className="tiny" onClick={() => setActiveDotColor(undefined)}>{t.auto}</button>
                 </div>
               </div>
             </div>
             <div className="cfg-row">
               <span className="cfg-label">
-                spacing&nbsp;<b>{spacingScale.toFixed(2)}</b>
+                {t.spacing}&nbsp;<b>{spacingScale.toFixed(2)}</b>
               </span>
               <input type="range" min={0.3} max={3} step={0.05} value={spacingScale} onChange={(e) => setSpacingScale(Number(e.target.value))} />
             </div>
@@ -252,9 +305,9 @@ export function App() {
 
           <div className="col usage">
             <div className="usage-head">
-              <span>使用示例</span>
+              <span>{t.usage}</span>
               <button className="copy-btn" onClick={copy}>
-                {copied ? '已复制 ✓' : '复制'}
+                {copied ? t.copied : t.copy}
               </button>
             </div>
             <pre className="code">
@@ -263,10 +316,7 @@ export function App() {
           </div>
         </div>
 
-        <p className="hint">
-          拖动窗口跨过 372 / 640px 可看到断点；content 切到 shapes / emoji 验证对应渲染器；motion 切到
-          ticker-left / ticker-right 看广告屏滚动。
-        </p>
+        <p className="hint">{t.hint}</p>
       </div>
     </div>
   );
