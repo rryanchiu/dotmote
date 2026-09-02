@@ -22,7 +22,7 @@ body {
 .page {
   position: relative;
   min-height: 100%;
-  padding: 24px 16px;
+  padding: 48px 16px 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -315,9 +315,15 @@ button.tiny {
   padding-top: 14px;
 }
 
-/* ---- responsive: stack columns on narrow screens ---- */
+/* ---- responsive: stack columns, shrink the card on small screens ---- */
 @media (max-width: 900px) {
   .panel-body {
     grid-template-columns: 1fr;
+  }
+
+  /* Keep the card only slightly wider than the widest control row (Motion),
+     so it doesn't dominate small screens. */
+  .panel {
+    max-width: 620px;
   }
 }
