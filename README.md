@@ -130,7 +130,7 @@ type ContentItem =
 
 ```bash
 npm install
-npm run dev       # playground at http://localhost:5199/examples/index.html
+npm run dev       # playground at http://localhost:5199/
 npm test          # vitest (physics + item normalization)
 npm run lint
 npm run typecheck
@@ -138,6 +138,23 @@ npm run build     # tsc → dist/
 ```
 
 The playground runs on any modern browser — resize across 372 / 640px to see the breakpoints, and open DevTools → Console to confirm the reload is clean.
+
+## Deploy the demo
+
+The playground (`examples/`) is a static Vite site; `npm run build:site` emits it to `site/`. The npm **library** is built separately with `npm run build` → `dist/` (that's what gets published to npm, not the site).
+
+### GitHub Pages
+
+1. Push the repo, then in Settings → **Pages → Source = "GitHub Actions"**.
+2. The included `.github/workflows/pages.yml` builds the demo on every push and publishes it at `https://<user>.github.io/dotmote/` (base `/dotmote/`).
+
+### Cloudflare Pages
+
+1. Dashboard → **Workers & Pages → Create → Pages → Connect to Git** → pick the repo.
+2. Build settings:
+   - Build command: `npm run build:site`
+   - Build output directory: `site`
+3. Leave the base path empty — Cloudflare serves from the domain root, so no `--base` is needed.
 
 ## Architecture
 

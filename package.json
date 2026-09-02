@@ -37,6 +37,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "build": "tsc -p tsconfig.build.json",
+    "build:site": "vite build",
     "prepublishOnly": "npm run build",
     "lint": "eslint . --ext .ts,.tsx",
     "test": "vitest run",
