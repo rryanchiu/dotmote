@@ -1,7 +1,7 @@
 {
   "name": "dotmote",
   "version": "0.1.0",
-  "description": "Brand-agnostic dotted-matrix glowing background component (React + TypeScript + Canvas). Zero runtime deps besides react.",
+  "description": "Brand-agnostic dotted-matrix glow background. Framework-agnostic Canvas core with thin React and Vue wrappers.",
   "keywords": [
     "react",
     "canvas",
@@ -26,6 +26,14 @@
     "./themes": {
       "types": "./dist/themes.d.ts",
       "import": "./dist/themes.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js"
+    },
+    "./vue": {
+      "types": "./dist/vue/index.d.ts",
+      "import": "./dist/vue/index.js"
     }
   },
   "files": [
@@ -45,7 +53,8 @@
     "clean": "rm -rf dist"
   },
   "peerDependencies": {
-    "react": ">=18"
+    "react": ">=18",
+    "vue": "^3.3"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
@@ -59,7 +68,8 @@
     "react-dom": "^18.3.1",
     "typescript": "^5.5.3",
     "vite": "^5.4.0",
-    "vitest": "^2.0.3"
+    "vitest": "^2.0.3",
+    "vue": "^3.4.2"
   },
   "engines": {
     "node": ">=18"

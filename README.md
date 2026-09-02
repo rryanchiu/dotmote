@@ -1,17 +1,20 @@
 # dotmote
 
-<p>
+<img src="docs/example.png" alt="dotmote — LED dot-matrix glow component" width="100%" />
+
+<p align="center">
   <a href="https://www.npmjs.com/package/dotmote"><img alt="npm" src="https://img.shields.io/npm/v/dotmote" /></a>
   <img alt="license" src="https://img.shields.io/npm/l/dotmote" />
   <img alt="bundle size" src="https://img.shields.io/bundlephobia/minzip/dotmote" />
+  <a href="https://dotmote.imryan.dev"><img alt="Live demo" src="https://img.shields.io/badge/Live%20demo-dotmote.imryan.dev-2ea44f" /></a>
   <a href="https://stackblitz.com/github/rryanchiu/dotmote"><img alt="Open in StackBlitz" src="https://img.shields.io/badge/Open%20in-StackBlitz-1269D3" /></a>
 </p>
 
-**[English](README.md)** · [简体中文](README.zh-CN.md)
+<p align="center">**[English](README.md)** · [简体中文](README.zh-CN.md)</p>
 
-> **Try it live** — [Open in StackBlitz](https://stackblitz.com/github/rryanchiu/dotmote) to run the playground in your browser. You can also import this GitHub repo into CodeSandbox.
+> **Live demo** — [dotmote.imryan.dev](https://dotmote.imryan.dev) · **Try it live**: [Open in StackBlitz](https://stackblitz.com/github/rryanchiu/dotmote) to run the playground in your browser. You can also import this GitHub repo into CodeSandbox.
 
-A dotted-matrix glow background for React. Scatter a few letters, emoji, or shapes over an endless grid of dots — they drift, bump into each other, and glow through the lattice like a little light show.
+A framework-agnostic dotted-matrix glow background for React and Vue. Scatter a few letters, emoji, or shapes over an endless grid of dots — they drift, bump into each other, and glow through the lattice like a little light show.
 
 - **React 18+** · TypeScript · Canvas 2D · **SSR-safe**
 - **Zero runtime deps** — just `react` (peer)
@@ -44,6 +47,25 @@ export function Page() {
 ```
 
 The wrapper `<div>` is absolutely positioned behind everything — put your content in a sibling with a higher `z-index`.
+
+## Vue
+
+The Canvas core is framework-agnostic — React and Vue are both thin wrappers over
+the same `createDotMatrixCore`. For Vue 3 use the `dotmote/vue` entry:
+
+```vue
+<script setup>
+import { Dotmote } from 'dotmote/vue';
+</script>
+
+<template>
+  <div style="position: relative; min-height: 40vh">
+    <Dotmote values="👋dotmote!" theme="auto" motion="ticker-right" />
+  </div>
+</template>
+```
+
+`class` / `style` fall through to the wrapper `<div>`.
 
 ## Props
 

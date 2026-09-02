@@ -42,8 +42,11 @@ export interface ThemeConfig {
   dotColor?: string;
   /** Color of the *illuminated* (lit) dots. When set the glow is a flat color (all three gradient stops). Omit to use `glow`. */
   activeDotColor?: string;
-  /** Three-stop linear gradient for the illuminated glow: [start, mid, end]. */
-  glow: [string, string, string];
+  /**
+   * Three-stop linear gradient for the illuminated glow: [start, mid, end].
+   * Optional — omit it to use a preset's gradient, or set `activeDotColor` for a flat color.
+   */
+  glow?: [string, string, string];
   /** Optional background color applied to the element (behind the dots). */
   background?: string;
 }

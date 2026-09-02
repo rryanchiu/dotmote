@@ -237,8 +237,8 @@ export function createDotMatrixCore(
 
   function computeGeometry(): void {
     dpr = computeDpr();
-    const scale = options.spacingScale || 1;
-    spacing = resolveSpacing(options, cssWidth) * scale;
+    const scale = options.spacingScale ?? 1;
+    spacing = Math.max(1, resolveSpacing(options, cssWidth) * scale);
     fontSize = resolveFontSize(options, cssWidth);
     dotRadius = options.dotRadius ?? (spacing <= 9 ? 0.82 : 1);
     edgePadding = spacing * 1.25;
@@ -320,7 +320,10 @@ export function createDotMatrixCore(
 
     // Measure every item up front so a row/ticker can be laid out centered.
     const metas = items.map((item, i) => {
-      const fs = resolveFontSize(opts, w);
+      const fsRaw = resolveFontSize(opts, w);
+      // In a row/ticker, cap the glyph size to ~90% of the available height so
+      // the text stays visible (not clipped) when the container is short.
+      const fs = row ? Math.min(fsRaw, h * 0.9) : fsRaw;
       const size = measureItemSize(lightCtx, item, fs, opts.fontFamily);
       return { item, i, fs, size };
     });

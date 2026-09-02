@@ -212,7 +212,7 @@ export function App() {
   const themeCfg = resolveTheme(theme);
   const dotSwatch = cssColorToHex(dotColor ?? themeCfg.dotColor, '#808080');
   const activeSwatch = cssColorToHex(
-    activeDotColor ?? (themeCfg.activeDotColor ?? themeCfg.glow[1]),
+    activeDotColor ?? (themeCfg.activeDotColor ?? themeCfg.glow?.[1]),
     '#a09f9f',
   );
 

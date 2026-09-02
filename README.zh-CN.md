@@ -1,14 +1,20 @@
 # dotmote
 
-<p>
+<img src="docs/example.png" alt="dotmote — LED 点阵流光组件" width="100%" />
+
+<p align="center">
   <a href="https://www.npmjs.com/package/dotmote"><img alt="npm" src="https://img.shields.io/npm/v/dotmote" /></a>
   <img alt="license" src="https://img.shields.io/npm/l/dotmote" />
   <img alt="bundle size" src="https://img.shields.io/bundlephobia/minzip/dotmote" />
+  <a href="https://dotmote.imryan.dev"><img alt="在线演示" src="https://img.shields.io/badge/Live%20demo-dotmote.imryan.dev-2ea44f" /></a>
+  <a href="https://stackblitz.com/github/rryanchiu/dotmote"><img alt="Open in StackBlitz" src="https://img.shields.io/badge/Open%20in-StackBlitz-1269D3" /></a>
 </p>
 
-[English](README.md) · **简体中文**
+<p align="center">[English](README.md) · **简体中文**</p>
 
-为 React 打造的点阵发光背景。把几个字母、emoji 或形状撒在一片无边的点阵上——它们四处漂移、彼此碰撞，然后从网格里透出光来，像一场小小的灯展。
+> **在线演示** — [dotmote.imryan.dev](https://dotmote.imryan.dev)。
+
+框架无关的点阵发光背景，支持 React 与 Vue。把几个字母、emoji 或形状撒在一片无边的点阵上——它们四处漂移、彼此碰撞，然后从网格里透出光来，像一场小小的灯展。
 
 - **React 18+** · TypeScript · Canvas 2D · **SSR 安全**
 - **零运行时依赖** —— 只需 `react`（peer）
@@ -41,6 +47,24 @@ export function Page() {
 ```
 
 外层包裹的 `<div>` 是绝对定位、垫在所有内容后面——把你的内容放进一个 `z-index` 更高的兄弟节点即可。
+
+## Vue
+
+Canvas 核心与框架无关——React 与 Vue 都只是同一套 `createDotMatrixCore` 的薄封装。Vue 3 用 `dotmote/vue` 入口：
+
+```vue
+<script setup>
+import { Dotmote } from 'dotmote/vue';
+</script>
+
+<template>
+  <div style="position: relative; min-height: 40vh">
+    <Dotmote values="👋dotmote!" theme="auto" motion="ticker-right" />
+  </div>
+</template>
+```
+
+`class` / `style` 会透传到外层 `<div>`。
 
 ## 属性
 

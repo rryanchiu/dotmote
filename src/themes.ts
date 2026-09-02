@@ -71,13 +71,14 @@ export function resolveTheme(theme?: ThemeLike, dark = false): ThemeConfig {
     return themes[dark ? 'dark' : 'light'];
   }
   // Inline config — clone so callers can't accidentally mutate our preset.
-  const glow =
-    Array.isArray(theme.glow) && theme.glow.length === 3
-      ? theme.glow
-      : themes[dark ? 'dark' : 'light'].glow;
+  const glow = (
+    Array.isArray(theme.glow) && theme.glow.length >= 3
+      ? [theme.glow[0]!, theme.glow[1]!, theme.glow[2]!]
+      : themes[dark ? 'dark' : 'light'].glow
+  ) as [string, string, string];
   return {
     dotColor: theme.dotColor ?? themes.mono.dotColor,
-    glow: [glow[0], glow[1], glow[2]],
+    glow,
     ...(theme.activeDotColor ? { activeDotColor: theme.activeDotColor } : {}),
     ...(theme.background ? { background: theme.background } : {}),
   };
