@@ -44,6 +44,12 @@ body {
   padding: 28px 26px 20px;
   background: rgba(17, 19, 24, 0.78);
   border-radius: 16px;
+  transition: padding 0.28s ease, border-radius 0.28s ease;
+}
+
+/* Collapsed mini-card: just the title + expand button. */
+.panel.collapsed {
+  padding: 16px 20px;
 }
 
 .panel-head h1 {
@@ -64,13 +70,37 @@ body {
   min-width: 0;
 }
 
+.head-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  color: inherit;
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .lang-select {
   flex-shrink: 0;
+  height: 36px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.25);
   color: inherit;
   border-radius: 8px;
-  padding: 6px 10px;
+  padding: 0 10px;
   font-size: 13px;
   cursor: pointer;
 }
@@ -83,6 +113,15 @@ body {
   margin: 4px 0 22px;
   font-size: 13px;
   opacity: 0.7;
+  max-height: 60px;
+  overflow: hidden;
+  transition: opacity 0.28s ease, max-height 0.28s ease, margin 0.28s ease;
+}
+
+.panel.collapsed .subtitle {
+  opacity: 0;
+  max-height: 0;
+  margin: 0;
 }
 
 .panel-body {
@@ -90,6 +129,15 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 28px;
   align-items: start;
+  overflow: hidden;
+  max-height: 1600px;
+  opacity: 1;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+.panel-body.hidden {
+  max-height: 0;
+  opacity: 0;
 }
 
 .col {
@@ -122,6 +170,7 @@ body {
 .cfg-row.two {
   gap: 28px;
   align-items: flex-end;
+  min-width: 0;
 }
 
 .cfg-label {
@@ -165,12 +214,14 @@ body {
   flex-direction: column;
   gap: 6px;
   flex: 1;
+  min-width: 0;
 }
 
 .color-group .color-row {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 }
 
 .color-group .tiny {
@@ -231,6 +282,7 @@ button.tiny {
 }
 
 .color-row input[type='color'] {
+  flex: 0 0 auto;
   width: 46px;
   height: 32px;
   padding: 0;
