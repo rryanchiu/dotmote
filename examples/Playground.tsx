@@ -18,6 +18,7 @@ interface Strings {
   dotRadius: string;
   fontSize: string;
   spacing: string;
+  charGap: string;
   dotColor: string;
   activeDot: string;
   auto: string;
@@ -40,6 +41,7 @@ const STRINGS: Record<Lang, Strings> = {
     dotRadius: 'dotRadius',
     fontSize: 'fontSize',
     spacing: 'spacing',
+    charGap: 'charGap',
     dotColor: 'dotColor',
     activeDot: 'activeDot',
     auto: 'auto',
@@ -60,6 +62,7 @@ const STRINGS: Record<Lang, Strings> = {
     dotRadius: '点半径',
     fontSize: '字符大小',
     spacing: '间距',
+    charGap: '字符间距',
     dotColor: '点颜色',
     activeDot: '高亮点',
     auto: '自动',
@@ -122,6 +125,7 @@ interface UsageState {
   dotRadius: number | undefined;
   fontSize: number | undefined;
   spacingScale: number;
+  charGap: number | undefined;
 }
 
 function buildUsageCode(p: UsageState): string {
@@ -134,6 +138,7 @@ function buildUsageCode(p: UsageState): string {
   if (p.dotRadius !== undefined) f.push(`dotRadius={${p.dotRadius}}`);
   if (p.fontSize !== undefined) f.push(`fontSize={${p.fontSize}}`);
   if (p.spacingScale !== 1) f.push(`spacingScale={${p.spacingScale}}`);
+  if (p.charGap !== undefined) f.push(`charGap={${p.charGap}}`);
 
   const header = "import { Dotmote } from 'dotmote';\n\n";
   const attrs = f.length ? `\n  ${f.join('\n  ')}\n` : '';
@@ -191,6 +196,7 @@ export function App() {
   const [dotColor, setDotColor] = useState<string | undefined>(undefined);
   const [activeDotColor, setActiveDotColor] = useState<string | undefined>(undefined);
   const [spacingScale, setSpacingScale] = useState(1);
+  const [charGap, setCharGap] = useState<number | undefined>(undefined);
   const [fontSize, setFontSize] = useState<number | undefined>(undefined);
   const [copied, setCopied] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -225,6 +231,7 @@ export function App() {
     dotRadius,
     fontSize,
     spacingScale,
+    charGap,
   };
 
   const usage = useMemo(
@@ -238,8 +245,9 @@ export function App() {
         dotRadius,
         fontSize,
         spacingScale,
+        charGap,
       }),
-    [resolvedTheme, content, speed, motion, glowStrength, dotRadius, fontSize, spacingScale],
+    [resolvedTheme, content, speed, motion, glowStrength, dotRadius, fontSize, spacingScale, charGap],
   );
 
   function copy() {
@@ -402,6 +410,15 @@ export function App() {
                 {t.spacing}&nbsp;<b>{spacingScale.toFixed(2)}</b>
               </span>
               <input type="range" min={0.3} max={3} step={0.05} value={spacingScale} onChange={(e) => setSpacingScale(Number(e.target.value))} />
+            </div>
+            <div className="cfg-row">
+              <span className="cfg-label">
+                {t.charGap}&nbsp;<b>{charGap ?? t.auto}</b>
+              </span>
+              <div className="range-wrap">
+                <input type="range" min={0} max={60} step={1} value={charGap ?? 8} onChange={(e) => setCharGap(Number(e.target.value))} />
+                <button className="tiny" onClick={() => setCharGap(undefined)}>{t.auto}</button>
+              </div>
             </div>
           </div>
 

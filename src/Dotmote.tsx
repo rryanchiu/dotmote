@@ -82,6 +82,7 @@ export function Dotmote(props: DotmoteProps): JSX.Element {
     props.fontSizeMax,
     props.breakpoints,
     props.spacingScale,
+    props.charGap,
     props.introDurationMs,
     dark,
   ]);

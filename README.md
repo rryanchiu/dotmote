@@ -84,6 +84,7 @@ import { Dotmote } from 'dotmote/vue';
 | `fontSizeMin` / `fontSizeMax` | `number` | `207` / `270` | Bounds of the automatic font clamp. |
 | `breakpoints` | `Partial<Breakpoints>` | `{small:372, medium:640, …}` | Responsive geometry. |
 | `spacingScale` | `number` | `1` | Lattice density — `<1` denser, `>1` sparser. |
+| `charGap` | `number` | `auto` | Gap between characters in `ticker` / `static` rows (px). Omit for an auto compact spacing. |
 | `introDurationMs` | `number` | `520` | Hold + fade-in period. |
 | `className` / `class` / `style` | `string` / `string` / `CSSProperties` | — | Passed to the wrapper `<div>`. `class` is an alias for `className`. |
 | `ariaHidden` | `boolean` | `true` | `aria-hidden` on the wrapper. |

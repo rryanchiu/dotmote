@@ -60,6 +60,7 @@ export function buildOptions(props: DotmoteProps, dark = false): CoreOptions {
     fontSizeMax: props.fontSizeMax ?? 270,
     breakpoints: { ...DEFAULT_BREAKPOINTS, ...(props.breakpoints ?? {}) },
     spacingScale: props.spacingScale ?? 1,
+    charGap: props.charGap,
     introDurationMs: props.introDurationMs ?? 520,
   };
 }

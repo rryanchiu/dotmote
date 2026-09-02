@@ -242,7 +242,7 @@ export function createDotMatrixCore(
     fontSize = resolveFontSize(options, cssWidth);
     dotRadius = options.dotRadius ?? (spacing <= 9 ? 0.82 : 1);
     edgePadding = spacing * 1.25;
-    tickerGapPx = Math.max(16, fontSize * 0.5);
+    tickerGapPx = options.charGap ?? Math.max(8, Math.round(fontSize * 0.3));
   }
 
   function applyTransform(ctx: CanvasRenderingContext2D): void {

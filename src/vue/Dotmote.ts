@@ -45,6 +45,7 @@ export const Dotmote = defineComponent({
     fontSizeMax: { type: Number, default: undefined },
     breakpoints: { type: Object, default: undefined },
     spacingScale: { type: Number, default: undefined },
+    charGap: { type: Number, default: undefined },
     introDurationMs: { type: Number, default: undefined },
     ariaHidden: { type: Boolean, default: true },
   },

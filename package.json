@@ -1,6 +1,6 @@
 {
   "name": "dotmote",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "Brand-agnostic dotted-matrix glow background. Framework-agnostic Canvas core with thin React and Vue wrappers.",
   "keywords": [
     "react",

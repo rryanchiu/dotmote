@@ -120,6 +120,8 @@ export interface DotmoteProps {
    * `>1` sparser. This also scales the edge padding and the default dot size.
    */
   spacingScale?: number;
+  /** Gap between characters in the `ticker` / `static` row (px). Defaults to an auto, compact value. */
+  charGap?: number;
   /** Intro hold duration in ms during which bodies are frozen and fade in. Defaults to `520`. */
   introDurationMs?: number;
   /** Passed through to the container `<div>`. */
@@ -155,6 +157,7 @@ export interface CoreOptions {
   fontSizeMax: number;
   breakpoints: Breakpoints;
   spacingScale: number;
+  charGap?: number;
   introDurationMs: number;
 }
 
