@@ -298,6 +298,14 @@ button.tiny {
   max-height: 70vh;
 }
 
+.code-install {
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  font-size: 12px;
+  opacity: 0.9;
+  background: rgba(8, 10, 14, 0.6);
+}
+
 .hint {
   margin: 18px 0 0;
   font-size: 12.5px;

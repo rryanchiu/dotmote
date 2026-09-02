@@ -88,7 +88,8 @@ function resolveSpacing(options: CoreOptions, width: number): number {
 }
 
 function resolveFontSize(options: CoreOptions, width: number): number {
-  const { fontSizeOverride, fontSizeMin, fontSizeMax, breakpoints } = options;
+  const { fontSize, fontSizeOverride, fontSizeMin, fontSizeMax, breakpoints } = options;
+  if (fontSize != null) return fontSize;
   if (fontSizeOverride != null) {
     return typeof fontSizeOverride === 'function'
       ? fontSizeOverride(width)
@@ -308,35 +309,46 @@ export function createDotMatrixCore(
     opts: CoreOptions,
     startMs: number,
   ): Body[] {
-    const list: Body[] = [];
     const pad = edgePadding;
     const usableW = Math.max(0, w - 2 * pad);
     const usableH = Math.max(0, h - 2 * pad);
     const ticker = isTickerMotion(opts.motion);
-    const dir: 1 | -1 = opts.motion === 'ticker-left' ? 1 : -1;
+    const row = ticker || opts.motion === 'static';
+    const dir = opts.motion === 'ticker-left' ? 1 : -1;
     const base = w < opts.breakpoints.medium ? 90 : 112;
     const gap = tickerGapPx;
-    // For the ticker, lay the bodies out in a single centered row from one edge.
-    let cursor = ticker ? (dir > 0 ? 0 : w) : 0;
 
-    items.forEach((item, i) => {
+    // Measure every item up front so a row/ticker can be laid out centered.
+    const metas = items.map((item, i) => {
       const fs = resolveFontSize(opts, w);
       const size = measureItemSize(lightCtx, item, fs, opts.fontFamily);
+      return { item, i, fs, size };
+    });
+
+    let rowWidth = 0;
+    for (const m of metas) rowWidth += m.size.width;
+    rowWidth += gap * (metas.length - 1);
+    let cursor = (w - rowWidth) / 2; // left edge of the first body
+
+    const list: Body[] = [];
+    for (const m of metas) {
+      const s = m.size;
       let cx: number;
       let cy: number;
       let vx: number;
       let vy: number;
 
-      if (ticker) {
-        cy = h / 2 + ((i % 3) - 1) * fs * 0.1;
-        cx = cursor;
-        cursor += (size.width + gap) * dir;
+      if (row) {
+        // One horizontally-aligned row at the vertical center; static is frozen.
+        cy = h / 2;
+        cx = cursor + s.width / 2;
+        cursor += s.width + gap;
         const speed = base * opts.speed;
-        vx = dir * speed;
+        vx = ticker ? dir * speed : 0;
         vy = 0;
       } else {
-        const angle = getInitialAngle(i);
-        const speed = (base + i * 4) * opts.speed;
+        const angle = getInitialAngle(m.i);
+        const speed = (base + m.i * 4) * opts.speed;
         vx = Math.cos(angle) * speed;
         vy = Math.sin(angle) * speed;
         cx = pad + (usableW > 0 ? Math.random() * usableW : 0);
@@ -344,19 +356,19 @@ export function createDotMatrixCore(
       }
 
       list.push({
-        id: i,
-        item,
+        id: m.i,
+        item: m.item,
         centerX: cx,
         centerY: cy,
-        width: size.width,
-        height: size.height,
-        fontSize: fs,
+        width: s.width,
+        height: s.height,
+        fontSize: m.fs,
         velocityX: vx,
         velocityY: vy,
         colors: [opts.glow[0], opts.glow[1], opts.glow[2]],
         introStart: startMs,
       });
-    });
+    }
     return list;
   }
 
@@ -478,7 +490,10 @@ export function createDotMatrixCore(
       return;
     }
     const dir: 1 | -1 = mode === 'ticker-left' ? 1 : -1;
-    stepTicker(active, dt, cssWidth, dir, tickerGapPx);
+    let sumW = 0;
+    for (const b of bodies) sumW += b.width;
+    const track = sumW + tickerGapPx * bodies.length;
+    stepTicker(active, dt, cssWidth, dir, tickerGapPx, track);
   }
 
   function frame(timestamp: number): void {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 
 import type {
@@ -37,8 +37,8 @@ function resolveItemBodies(props: DotmoteProps): ContentItem[] {
   return normalizeItems(props.items ?? DEFAULT_ITEMS_INPUT);
 }
 
-function buildOptions(props: DotmoteProps): CoreOptions {
-  const theme = resolveTheme(props.theme);
+function buildOptions(props: DotmoteProps, dark = false): CoreOptions {
+  const theme = resolveTheme(props.theme, dark);
   const glow: [string, string, string] = theme.activeDotColor
     ? [theme.activeDotColor, theme.activeDotColor, theme.activeDotColor]
     : theme.glow ?? DEFAULT_GLOW;
@@ -52,6 +52,7 @@ function buildOptions(props: DotmoteProps): CoreOptions {
     speed: props.speed ?? 1,
     motion: props.motion ?? 'drift',
     fontFamily: props.fontFamily ?? DEFAULT_FONT_FAMILY,
+    fontSize: props.fontSize,
     fontSizeOverride: props.fontSizeOverride,
     fontSizeMin: props.fontSizeMin ?? 207,
     fontSizeMax: props.fontSizeMax ?? 270,
@@ -89,9 +90,27 @@ const canvasStyle: CSSProperties = {
 export function Dotmote(props: DotmoteProps): JSX.Element {
   const {
     className,
+    class: cls,
     style,
     ariaHidden = true,
   } = props;
+  // `class` is an HTML-style alias for `className` (React uses `className`).
+  const wrapperClass = className ?? cls;
+
+  // OS color scheme, used only when `theme` resolves to `auto`. Defaults to
+  // light so server / static rendering stays SSR-safe (no `window`/`matchMedia`
+  // at render time); it syncs to the real value after mount.
+  const [dark, setDark] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return;
+    }
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const update = () => setDark(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -101,7 +120,7 @@ export function Dotmote(props: DotmoteProps): JSX.Element {
   // object) so inline `theme` / `breakpoints` literals don't rebuild options
   // every render. buildOptions reads only the fields listed below.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const options = useMemo(() => buildOptions(props), [
+  const options = useMemo(() => buildOptions(props, dark), [
     props.values,
     props.items,
     props.theme,
@@ -111,12 +130,14 @@ export function Dotmote(props: DotmoteProps): JSX.Element {
     props.speed,
     props.motion,
     props.fontFamily,
+    props.fontSize,
     props.fontSizeOverride,
     props.fontSizeMin,
     props.fontSizeMax,
     props.breakpoints,
     props.spacingScale,
     props.introDurationMs,
+    dark,
   ]);
 
   // Keep the latest options available to the mount effect without re-running it.
@@ -146,7 +167,7 @@ export function Dotmote(props: DotmoteProps): JSX.Element {
   return (
     <div
       ref={containerRef}
-      className={className}
+      className={wrapperClass}
       style={{ ...containerBase, ...style }}
       aria-hidden={ariaHidden}
     >

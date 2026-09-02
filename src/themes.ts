@@ -1,13 +1,13 @@
-import type { ThemeConfig, ThemeLike } from './types';
+import type { ThemeConfig, ThemeLike } from './types.js';
 
 /**
- * Built-in neutral, brand-agnostic theme presets.
+ * Built-in brand-agnostic theme presets.
  *
- * All three rgb stops and dot colors are intentionally generic so the backdrop
- * reads as "subtle dotted texture", not a particular brand. Swap them out via
- * the `theme` prop with an inline {@link ThemeConfig} if you need custom colors.
+ * All rgb stops and dot colors are intentionally generic so the backdrop reads
+ * as "subtle dotted texture", not a particular brand. Swap them out via the
+ * `theme` prop with an inline {@link ThemeConfig} if you need custom colors.
  */
-export const themes: Record<'light' | 'dark' | 'mono' | 'gradient' | 'rainbow', ThemeConfig> = {
+export const themes: Record<'light' | 'dark' | 'mono' | 'gradient', ThemeConfig> = {
   /** Classic light theme: white background, soft gray dots, mid-gray glow. */
   light: {
     background: '#ffffff',
@@ -45,37 +45,36 @@ export const themes: Record<'light' | 'dark' | 'mono' | 'gradient' | 'rainbow', 
       'rgba(236, 72, 153, 0.9)',
     ],
   },
-  /** Rainbow glow: a red → green → blue sweep for the illuminated dots. */
-  rainbow: {
-    dotColor: 'rgba(128, 128, 128, 0.5)',
-    glow: [
-      'rgba(255, 77, 77, 0.9)',
-      'rgba(61, 220, 132, 0.9)',
-      'rgba(77, 159, 255, 0.9)',
-    ],
-  },
 };
 
-const PRESET_KEYS = new Set(['light', 'dark', 'mono', 'gradient', 'rainbow']);
+const THEME_KEYS = new Set(['light', 'dark', 'mono', 'gradient']) as Set<
+  keyof typeof themes
+>;
 
 /**
  * Resolve a {@link ThemeLike} into a concrete {@link ThemeConfig}.
  *
- * @param theme A preset name or an inline config. Defaults to `'mono'` when
- *   `undefined`.
+ * `auto` (or `undefined`) resolves to `light`/`dark` based on `dark`. Pass the
+ * current OS `prefers-color-scheme` value here; it defaults to light so the
+ * function stays SSR-safe (it never touches `window`/`matchMedia` itself).
+ *
+ * @param theme A preset name or an inline config. Defaults to `auto`.
+ * @param dark  Whether the OS prefers a dark scheme (used only for `auto`).
  */
-export function resolveTheme(theme?: ThemeLike): ThemeConfig {
-  if (theme === undefined || theme === null) return themes.mono;
+export function resolveTheme(theme?: ThemeLike, dark = false): ThemeConfig {
+  if (theme === undefined || theme === null || theme === 'auto') {
+    return themes[dark ? 'dark' : 'light'];
+  }
   if (typeof theme === 'string') {
-    if (PRESET_KEYS.has(theme)) return themes[theme as keyof typeof themes];
-    // Unknown preset: fall back to the neutral default rather than crashing.
-    return themes.mono;
+    if (THEME_KEYS.has(theme)) return themes[theme as keyof typeof themes];
+    // Unknown preset name: fall back to the scheme-appropriate default.
+    return themes[dark ? 'dark' : 'light'];
   }
   // Inline config — clone so callers can't accidentally mutate our preset.
   const glow =
     Array.isArray(theme.glow) && theme.glow.length === 3
       ? theme.glow
-      : themes.mono.glow;
+      : themes[dark ? 'dark' : 'light'].glow;
   return {
     dotColor: theme.dotColor ?? themes.mono.dotColor,
     glow: [glow[0], glow[1], glow[2]],

@@ -3,7 +3,7 @@ import { Dotmote, resolveTheme } from '../src';
 import type { DotmoteProps, MotionMode, ThemeConfig, ThemePreset } from '../src';
 import './playground.css';
 
-const THEMES: ThemePreset[] = ['mono', 'light', 'dark', 'gradient', 'rainbow'];
+const THEMES: ThemePreset[] = ['auto', 'light', 'dark', 'mono', 'gradient'];
 const MOTIONS: MotionMode[] = ['drift', 'roam', 'static', 'ticker-left', 'ticker-right'];
 
 type Lang = 'en' | 'zh';
@@ -16,6 +16,7 @@ interface Strings {
   speed: string;
   glow: string;
   dotRadius: string;
+  fontSize: string;
   spacing: string;
   dotColor: string;
   activeDot: string;
@@ -24,7 +25,6 @@ interface Strings {
   copy: string;
   copied: string;
   contentPlaceholder: string;
-  hint: string;
 }
 
 const STRINGS: Record<Lang, Strings> = {
@@ -36,6 +36,7 @@ const STRINGS: Record<Lang, Strings> = {
     speed: 'speed',
     glow: 'glow',
     dotRadius: 'dotRadius',
+    fontSize: 'fontSize',
     spacing: 'spacing',
     dotColor: 'dotColor',
     activeDot: 'activeDot',
@@ -44,7 +45,6 @@ const STRINGS: Record<Lang, Strings> = {
     copy: 'Copy',
     copied: 'Copied ✓',
     contentPlaceholder: 'Type content…',
-    hint: 'Type content above — each character becomes a drifting body. Resize across 372 / 640px to see breakpoints; switch motion to ticker-left / ticker-right for the marquee look.',
   },
   zh: {
     subtitle: '点阵发光背景 · React + Canvas',
@@ -54,6 +54,7 @@ const STRINGS: Record<Lang, Strings> = {
     speed: '速度',
     glow: '辉光',
     dotRadius: '点半径',
+    fontSize: '字符大小',
     spacing: '间距',
     dotColor: '点颜色',
     activeDot: '高亮点',
@@ -62,7 +63,6 @@ const STRINGS: Record<Lang, Strings> = {
     copy: '复制',
     copied: '已复制 ✓',
     contentPlaceholder: '输入内容…',
-    hint: '在上方输入内容，每个字符会成为漂浮主体；拖动窗口跨过 372 / 640px 可看到断点；motion 切到 ticker-left / ticker-right 看广告屏滚动。',
   },
 };
 
@@ -103,17 +103,19 @@ interface UsageState {
   motion: MotionMode;
   glowStrength: number;
   dotRadius: number | undefined;
+  fontSize: number | undefined;
   spacingScale: number;
 }
 
 function buildUsageCode(p: UsageState): string {
   const f: string[] = [];
-  if (p.theme !== 'mono') f.push(themeAttr(p.theme));
+  if (p.theme !== 'auto') f.push(themeAttr(p.theme));
   if (p.values.trim()) f.push(valuesAttr(p.values));
   if (p.speed !== 1) f.push(`speed={${p.speed}}`);
   if (p.motion !== 'drift') f.push(`motion="${p.motion}"`);
   if (p.glowStrength !== 1) f.push(`glowStrength={${p.glowStrength}}`);
   if (p.dotRadius !== undefined) f.push(`dotRadius={${p.dotRadius}}`);
+  if (p.fontSize !== undefined) f.push(`fontSize={${p.fontSize}}`);
   if (p.spacingScale !== 1) f.push(`spacingScale={${p.spacingScale}}`);
 
   const header = "import { Dotmote } from 'dotmote';\n\n";
@@ -121,9 +123,11 @@ function buildUsageCode(p: UsageState): string {
   return `${header}<Dotmote${attrs} />`;
 }
 
+const INSTALL = 'npm install dotmote';
+
 export function App() {
-  const [theme, setTheme] = useState<ThemePreset>('gradient');
-  const [content, setContent] = useState('dotmote');
+  const [theme, setTheme] = useState<ThemePreset>('auto');
+  const [content, setContent] = useState('👋dotmote!');
   const [speed, setSpeed] = useState(1);
   const [motion, setMotion] = useState<MotionMode>('drift');
   const [glowStrength, setGlowStrength] = useState(1);
@@ -131,6 +135,7 @@ export function App() {
   const [dotColor, setDotColor] = useState<string | undefined>(undefined);
   const [activeDotColor, setActiveDotColor] = useState<string | undefined>(undefined);
   const [spacingScale, setSpacingScale] = useState(1);
+  const [fontSize, setFontSize] = useState<number | undefined>(undefined);
   const [copied, setCopied] = useState(false);
   const [lang, setLang] = useState<Lang>(detectLang);
   const t = STRINGS[lang];
@@ -152,6 +157,7 @@ export function App() {
     motion,
     glowStrength,
     dotRadius,
+    fontSize,
     spacingScale,
   };
 
@@ -164,9 +170,10 @@ export function App() {
         motion,
         glowStrength,
         dotRadius,
+        fontSize,
         spacingScale,
       }),
-    [resolvedTheme, content, speed, motion, glowStrength, dotRadius, spacingScale],
+    [resolvedTheme, content, speed, motion, glowStrength, dotRadius, fontSize, spacingScale],
   );
 
   function copy() {
@@ -279,6 +286,15 @@ export function App() {
                 <button className="tiny" onClick={() => setDotRadius(undefined)}>{t.auto}</button>
               </div>
             </div>
+            <div className="cfg-row">
+              <span className="cfg-label">
+                {t.fontSize}&nbsp;<b>{fontSize ?? t.auto}</b>
+              </span>
+              <div className="range-wrap">
+                <input type="range" min={80} max={320} step={4} value={fontSize ?? 0} onChange={(e) => setFontSize(Number(e.target.value) || undefined)} />
+                <button className="tiny" onClick={() => setFontSize(undefined)}>{t.auto}</button>
+              </div>
+            </div>
             <div className="cfg-row two">
               <div className="color-group">
                 <span className="cfg-label">{t.dotColor}</span>
@@ -310,13 +326,14 @@ export function App() {
                 {copied ? t.copied : t.copy}
               </button>
             </div>
+            <pre className="code code-install">
+              <code>{INSTALL}</code>
+            </pre>
             <pre className="code">
               <code>{usage}</code>
             </pre>
           </div>
         </div>
-
-        <p className="hint">{t.hint}</p>
       </div>
     </div>
   );

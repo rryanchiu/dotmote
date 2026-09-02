@@ -4,9 +4,12 @@
   <a href="https://www.npmjs.com/package/dotmote"><img alt="npm" src="https://img.shields.io/npm/v/dotmote" /></a>
   <img alt="license" src="https://img.shields.io/npm/l/dotmote" />
   <img alt="bundle size" src="https://img.shields.io/bundlephobia/minzip/dotmote" />
+  <a href="https://stackblitz.com/github/rryanchiu/dotmote"><img alt="Open in StackBlitz" src="https://img.shields.io/badge/Open%20in-StackBlitz-1269D3" /></a>
 </p>
 
 **[English](README.md)** · [简体中文](README.zh-CN.md)
+
+> **Try it live** — [Open in StackBlitz](https://stackblitz.com/github/rryanchiu/dotmote) to run the playground in your browser. You can also import this GitHub repo into CodeSandbox.
 
 A dotted-matrix glow background for React. Scatter a few letters, emoji, or shapes over an endless grid of dots — they drift, bump into each other, and glow through the lattice like a little light show.
 
@@ -48,18 +51,19 @@ The wrapper `<div>` is absolutely positioned behind everything — put your cont
 | --- | --- | --- | --- |
 | `values` | `string` | — | Content as a string — each character becomes one body (whitespace skipped). Shorthand for `items`. |
 | `items` | `(ContentItem \| string)[]` | `['A','B','C','D','E']` | The bodies to drift. Strings become letters; see [Content](#content). |
-| `theme` | `ThemePreset \| ThemeConfig` | `'mono'` | A preset name or an inline config (`dotColor`, `activeDotColor`, `glow`, `background`). |
+| `theme` | `ThemePreset \| ThemeConfig` | `'auto'` | A preset name or an inline config (`dotColor`, `activeDotColor`, `glow`, `background`). `auto` picks `light`/`dark` from the OS. |
 | `motion` | `MotionMode` | `'drift'` | How the bodies move — see [Motion](#motion). |
 | `speed` | `number` | `1` | Global speed multiplier. |
 | `glowStrength` | `number` | `1` | Glow strength: `<1` fades it, `>1` brightens. (`glowAlpha` is a deprecated alias.) |
 | `dotRadius` | `number` | `spacing <= 9 ? 0.82 : 1` | Dot size in px. Bigger = chunkier dots. |
 | `fontFamily` | `string` | `"Trebuchet MS", ui-rounded, sans-serif` | Font stack (weight/size are prefixed: `900 ${fontSize}px …`). |
+| `fontSize` | `number` | — | Fixed character size in px. Overrides the auto size (and `fontSizeOverride`). |
 | `fontSizeOverride` | `number \| ((w)=>number)` | — | Override the automatic font size. |
 | `fontSizeMin` / `fontSizeMax` | `number` | `207` / `270` | Bounds of the automatic font clamp. |
 | `breakpoints` | `Partial<Breakpoints>` | `{small:372, medium:640, …}` | Responsive geometry. |
 | `spacingScale` | `number` | `1` | Lattice density — `<1` denser, `>1` sparser. |
 | `introDurationMs` | `number` | `520` | Hold + fade-in period. |
-| `className` / `style` | `string` / `CSSProperties` | — | Passed to the wrapper `<div>`. |
+| `className` / `class` / `style` | `string` / `string` / `CSSProperties` | — | Passed to the wrapper `<div>`. `class` is an alias for `className`. |
 | `ariaHidden` | `boolean` | `true` | `aria-hidden` on the wrapper. |
 
 ## Themes
@@ -80,7 +84,9 @@ Pick a neutral preset, or bring your own colors:
 />
 ```
 
-Presets: `light`, `dark`, `mono`, `gradient`, `rainbow`.
+Presets: `auto`, `light`, `dark`, `mono`, `gradient`. `auto` (the default) follows
+the OS `prefers-color-scheme` — leave `theme` out to use it. The quick start uses
+`theme="gradient"`; pass `theme="mono"` for no background + neutral gray dots.
 
 ```ts
 interface ThemeConfig {
@@ -123,8 +129,8 @@ type ContentItem =
 | --- | --- |
 | `drift` | drift + wall bounce + pairs collide |
 | `roam` | drift + bounce, bodies pass through each other |
-| `static` | frozen after the intro fade |
-| `ticker-left` / `ticker-right` | marquee: bodies line up in a row and scroll, looping |
+| `static` | frozen after the intro fade — laid out horizontally-aligned as a centered row |
+| `ticker-left` / `ticker-right` | marquee: horizontally-aligned row at the center, scrolling and looping with even spacing |
 
 ## Development
 

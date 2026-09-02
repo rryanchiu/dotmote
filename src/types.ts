@@ -48,8 +48,8 @@ export interface ThemeConfig {
   background?: string;
 }
 
-/** Built-in neutral, brand-agnostic theme names. */
-export type ThemePreset = 'light' | 'dark' | 'mono' | 'gradient' | 'rainbow';
+/** Built-in theme names. `auto` resolves to `light`/`dark` from the OS setting. */
+export type ThemePreset = 'auto' | 'light' | 'dark' | 'mono' | 'gradient';
 
 /** A theme may be a preset name or an inline config. */
 export type ThemeLike = ThemePreset | ThemeConfig;
@@ -96,6 +96,11 @@ export interface DotmoteProps {
    */
   fontFamily?: string;
   /**
+   * Fixed character size in px. Overrides the automatic font size (and
+   * `fontSizeOverride`). Defaults to the responsive clamp / breakpoint logic.
+   */
+  fontSize?: number;
+  /**
    * Override the automatic font size for the largest breakpoint.
    * A number sets it directly; a function receives the container width in px.
    */
@@ -116,6 +121,8 @@ export interface DotmoteProps {
   introDurationMs?: number;
   /** Passed through to the container `<div>`. */
   className?: string;
+  /** Alias for `className` (HTML-style). Used when `className` is omitted. */
+  class?: string;
   /** Passed through to the container `<div>`. */
   style?: React.CSSProperties;
   /** Hide the element from assistive tech. Defaults to `true`. */
@@ -139,6 +146,7 @@ export interface CoreOptions {
   speed: number;
   motion: MotionMode;
   fontFamily: string;
+  fontSize?: number;
   fontSizeOverride?: number | ((width: number) => number);
   fontSizeMin: number;
   fontSizeMax: number;

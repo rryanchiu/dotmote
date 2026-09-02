@@ -147,14 +147,14 @@ describe('stepTicker (horizontal marquee wrap)', () => {
   it('wraps a right-moving body back onto the left side', () => {
     const a = mkBody({ centerX: 490, width: 40, velocityX: 100 });
     // 0.5s → x = 540; right edge 520 > 510 → wrap by track (520) → 20
-    stepTicker([a], 0.5, 500, 1, 10);
+    stepTicker([a], 0.5, 500, 1, 10, 520);
     expect(a.centerX).toBeCloseTo(20);
   });
 
   it('wraps a left-moving body back onto the right side', () => {
     const a = mkBody({ centerX: 10, width: 40, velocityX: -100 });
     // left edge -20 < -10 → wrap by track (520) → 480
-    stepTicker([a], 0.5, 500, -1, 10);
+    stepTicker([a], 0.5, 500, -1, 10, 520);
     expect(a.centerX).toBeCloseTo(480);
   });
 });
