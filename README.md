@@ -1,6 +1,6 @@
 # dotmote
 
-<img src="docs/example.png" alt="dotmote — LED dot-matrix glow component" width="100%" />
+<img src="https://raw.githubusercontent.com/rryanchiu/dotmote/main/docs/example.png" alt="dotmote — LED dot-matrix glow component" width="100%" />
 
 <p align="center">
   <a href="https://www.npmjs.com/package/dotmote"><img alt="npm" src="https://img.shields.io/npm/v/dotmote" /></a>
@@ -10,7 +10,7 @@
   <a href="https://stackblitz.com/github/rryanchiu/dotmote"><img alt="Open in StackBlitz" src="https://img.shields.io/badge/Open%20in-StackBlitz-1269D3" /></a>
 </p>
 
-<p align="center">**[English](README.md)** · [简体中文](README.zh-CN.md)</p>
+<p align="center">[English](https://github.com/rryanchiu/dotmote/blob/main/README.md) · [简体中文](https://github.com/rryanchiu/dotmote/blob/main/README.zh-CN.md)</p>
 
 > **Live demo** — [dotmote.imryan.dev](https://dotmote.imryan.dev) · **Try it live**: [Open in StackBlitz](https://stackblitz.com/github/rryanchiu/dotmote) to run the playground in your browser. You can also import this GitHub repo into CodeSandbox.
 

@@ -41,7 +41,7 @@ body {
   z-index: 1;
   max-width: 1080px;
   margin: auto;
-  padding: 28px 26px 20px;
+  padding: 28px 20px 12px;
   background: rgba(17, 19, 24, 0.78);
   border-radius: 16px;
   transition: padding 0.28s ease, border-radius 0.28s ease;
@@ -128,7 +128,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 28px;
-  align-items: start;
+  align-items: stretch;
   overflow: hidden;
   max-height: 1600px;
   opacity: 1;
@@ -303,6 +303,10 @@ button.tiny {
 }
 
 /* ---- usage column ---- */
+.col.usage {
+  gap: 12px;
+}
+
 .usage {
   position: sticky;
   top: 0;
@@ -347,15 +351,24 @@ button.tiny {
   color: #d7e3f4;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* In the usage column the code block flexes to fill the space down to the
+   preview bar, so there's no dead gap (content scrolls if it overflows). */
+.col.usage .code:not(.code-install) {
+  flex: 1;
+  min-height: 60px;
 }
 
 .code-install {
-  margin-bottom: 12px;
+  margin-bottom: 0;
   padding: 10px 14px;
   font-size: 12px;
   opacity: 0.9;
   background: rgba(8, 10, 14, 0.6);
+  height: auto;
+  overflow: visible;
 }
 
 .hint {

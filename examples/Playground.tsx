@@ -435,6 +435,28 @@ export function App() {
             <pre className="code">
               <code>{usage}</code>
             </pre>
+            <div
+              className="live-demo"
+              style={{
+                position: 'relative',
+                width: '100%',
+                height: 40,
+                borderRadius: 8,
+                overflow: 'hidden',
+                background: 'rgba(0, 0, 0, 0.25)',
+              }}
+            >
+              <Dotmote
+                values="👋dotmote"
+                dotRadius={2}
+                motion="ticker-right"
+                glowStrength={4}
+                theme="dark"
+                spacingScale={0.6}
+                fontSize={28}
+                charGap={2}
+              />
+            </div>
           </div>
         </div>
       </div>
