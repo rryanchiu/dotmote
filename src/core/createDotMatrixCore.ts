@@ -331,7 +331,9 @@ export function createDotMatrixCore(
     let rowWidth = 0;
     for (const m of metas) rowWidth += m.size.width;
     rowWidth += gap * (metas.length - 1);
-    let cursor = (w - rowWidth) / 2; // left edge of the first body
+    // Align a ticker row to its entering edge (right for ticker-right, left for
+    // ticker-left) so the loop starts at the container border; static stays centered.
+    let cursor = ticker ? (dir < 0 ? w - rowWidth : 0) : (w - rowWidth) / 2;
 
     const list: Body[] = [];
     for (const m of metas) {
@@ -397,6 +399,33 @@ export function createDotMatrixCore(
       b.fontSize = fontSize;
       b.centerX = clampCenter(b.centerX);
       b.centerY = clampCenter(b.centerY);
+    }
+  }
+
+  /**
+   * Re-lay a ticker/static row out for the current (possibly new) width, so the
+   * characters stay aligned to the container edge / center after a resize. Keeps
+   * velocities and intro timestamps — only positions/sizes are recomputed.
+   */
+  function relayoutRow(): void {
+    if (!bodies.length) return;
+    const ticker = isTickerMotion(options.motion);
+    const dir = options.motion === 'ticker-left' ? 1 : -1;
+    const gap = tickerGapPx;
+    for (const b of bodies) {
+      const size = measureItemSize(lightCtx, b.item, fontSize, options.fontFamily);
+      b.width = size.width;
+      b.height = size.height;
+      b.fontSize = fontSize;
+      b.centerY = cssHeight / 2;
+    }
+    let rowWidth = 0;
+    for (const b of bodies) rowWidth += b.width;
+    rowWidth += gap * (bodies.length - 1);
+    let cursor = ticker ? (dir < 0 ? cssWidth - rowWidth : 0) : (cssWidth - rowWidth) / 2;
+    for (const b of bodies) {
+      b.centerX = cursor + b.width / 2;
+      cursor += b.width + gap;
     }
   }
 
@@ -493,10 +522,7 @@ export function createDotMatrixCore(
       return;
     }
     const dir: 1 | -1 = mode === 'ticker-left' ? 1 : -1;
-    let sumW = 0;
-    for (const b of bodies) sumW += b.width;
-    const track = sumW + tickerGapPx * bodies.length;
-    stepTicker(active, dt, cssWidth, dir, tickerGapPx, track);
+    stepTicker(active, dt, cssWidth, dir, tickerGapPx);
   }
 
   function frame(timestamp: number): void {
@@ -551,7 +577,11 @@ export function createDotMatrixCore(
     if (pendingItems) {
       rebuildBodies();
     } else if (bodies.length) {
-      refreshBodySizes();
+      if (isTickerMotion(options.motion) || options.motion === 'static') {
+        relayoutRow();
+      } else {
+        refreshBodySizes();
+      }
     }
     redrawStatic();
     applyBackground();
@@ -579,7 +609,11 @@ export function createDotMatrixCore(
       pendingItems = options.items;
       if (sizeKnown) rebuildBodies();
     } else if (sizeKnown) {
-      refreshBodySizes();
+      if (isTickerMotion(options.motion) || options.motion === 'static') {
+        relayoutRow();
+      } else {
+        refreshBodySizes();
+      }
     }
 
     if (sizeKnown) {

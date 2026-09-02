@@ -155,8 +155,9 @@ export function stepRoam(
  * velocity already encodes direction) and wrap around a horizontal track.
  *
  * `dir` is `+1` for left→right and `-1` for right→left; `gap` is the padding
- * between a body and the screen edge that triggers a wrap. `track` is the loop
- * length (sum of body widths + `n * gap`), which keeps the first/last gap even.
+ * between a body and the screen edge that triggers a wrap. Wrap uses the
+ * *visible* container width (`width + 2*gap`) so characters enter/exit at the
+ * container's edges, keeping the loop aligned to the component's visible area.
  */
 export function stepTicker(
   bodies: Body[],
@@ -164,10 +165,9 @@ export function stepTicker(
   width: number,
   dir: 1 | -1,
   gap: number,
-  track?: number,
 ): void {
   if (dt <= 0) return;
-  const loop = track && track > 0 ? track : width + 2 * gap;
+  const loop = width + 2 * gap;
   for (const body of bodies) {
     body.centerX += body.velocityX * dt;
     if (dir > 0) {
