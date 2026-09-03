@@ -6,3 +6,4 @@ site
 .DS_Store
 *.tsbuildinfo
 .claude
+.idea

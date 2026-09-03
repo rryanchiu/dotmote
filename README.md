@@ -10,7 +10,11 @@
   <a href="https://stackblitz.com/github/rryanchiu/dotmote"><img alt="Open in StackBlitz" src="https://img.shields.io/badge/Open%20in-StackBlitz-1269D3" /></a>
 </p>
 
-<p align="center">[English](https://github.com/rryanchiu/dotmote/blob/main/README.md) · [简体中文](https://github.com/rryanchiu/dotmote/blob/main/README.zh-CN.md)</p>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/rryanchiu/dotmote/main/docs/dotmote.gif" alt="dotmote demo" width="82%" />
+</p>
+
+<p align="center"><a href="https://github.com/rryanchiu/dotmote/blob/main/README.md">English</a> · <a href="https://github.com/rryanchiu/dotmote/blob/main/README.zh-CN.md">简体中文</a></p>
 
 > **Live demo** — [dotmote.imryan.dev](https://dotmote.imryan.dev) · **Try it live**: [Open in StackBlitz](https://stackblitz.com/github/rryanchiu/dotmote) to run the playground in your browser. You can also import this GitHub repo into CodeSandbox.
 
