@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/rryanchiu/dotmote/main/docs/dotmote.gif" alt="dotmote 演示" width="82%" />
+  <img src="https://raw.githubusercontent.com/rryanchiu/dotmote/main/docs/dotmote.gif" alt="dotmote 演示" width="200" />
 </p>
 
 <p align="center"><a href="https://github.com/rryanchiu/dotmote/blob/main/README.md">English</a> · <a href="https://github.com/rryanchiu/dotmote/blob/main/README.zh-CN.md">简体中文</a></p>
